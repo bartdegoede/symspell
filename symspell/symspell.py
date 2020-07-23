@@ -1,12 +1,19 @@
 class Symspell(object):
-    def __init__(self, max_edit_distance=2, tokenizer=lambda x: x.split()):
-        self.max_edit_distance = max_edit_distance
+    def __init__(self, tokenizer=lambda x: x.split()):
         self.dictionary = {}
         self.longest_word_length = 0
         self.tokenizer = tokenizer
 
+    def _deletions(self, word):
+        splits = [(word[:i], word[i:]) for i in range(len(word))]
+        return [l + r[1:] for l, r in splits if r]
+
     def deletions(self, word):
-        return []
+        """
+        Given a word, derive strings with up to 2 characters deleted
+        """
+        deletions = self._deletions(word)
+        return set(deletions + [e2 for e1 in deletions for e2 in self._deletions(e1)])
 
     def create_dictionary_entry(self, word):
         """
